@@ -1,0 +1,12 @@
+.DS_Store
+Thumbs.db
+
+# Editor / local state
+.idea/
+.vscode/
+*.swp
+
+# Runtime caches
+__pycache__/
+.pytest_cache/
+node_modules/

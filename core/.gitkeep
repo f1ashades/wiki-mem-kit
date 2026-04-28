@@ -1,0 +1,9 @@
+# core/ 目录占位
+
+未来这里放：
+- mcp_server/ — MCP server 实现（Python，FastMCP）
+- skill/ — Claude Skill 实现（SKILL.md + 写入脚本）
+- parser/ — markdown + frontmatter 解析
+- index/ — 索引构建（FTS + 向量 + 图）
+
+MVP 阶段先聚焦在 presets/ 下的 page_type 设计，core/ 暂留空。

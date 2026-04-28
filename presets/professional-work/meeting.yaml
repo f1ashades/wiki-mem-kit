@@ -1,0 +1,45 @@
+name: meeting
+schema_version: 1
+
+description: |
+  一次具体的会议或 1-on-1 对齐。例如"2026-04-25-王五对齐"。
+
+  必须的 frontmatter（type 特化字段）：attendees（数组，参会者）、meeting_date
+  通用 frontmatter（title、type、schema_version、sources、review_status）见 docs/page-type-spec.md，所有 page 都必须有，不在此重复列。
+  可选：tags、follow_ups（数组，**当前活跃**待办事项，字符串）、mentions_people（数组，会议中提及但未参会的人）、obsolete_follow_ups（数组，**已失效**待办，每项是对象 {text, obsolete_reason, obsolete_date}）
+
+  何时归到这里：任何会议纪要、对齐记录、电话沟通、面对面交流的整理。
+
+  attendees vs mentions_people（不能混）：
+  - attendees = 实际参会者（你 + 对方），用于"我和谁开过会"的检索
+  - mentions_people = 会议中提到的第三方（如对方介绍的朋友、未在场的同事）
+    这些人后续可能成为新关系，进入 mentions_people 是为了让图谱在他们出现时能找回首次提及的会议
+
+  拆分原则：
+  - 一个会议 = 一个 meeting page，永远不拆（哪怕产生多个 decision）
+  - decision 拆开放到 decisions/，meeting page 在「会议要点」里 wikilink 引用
+  - 例：王五会议 → 1 个 meeting page + N 个 decision page，meeting 段落用 [[嘉宝棋牌室硬件接入方案]] 引用
+
+  更新规则：
+  - 每次会议新建独立 page，不更新已有
+  - 文件名格式：{meeting_date}-{对方主名 或 主题}.md，例 2026-04-25-王五.md
+  - 「会议要点」段写本次议题、决议指针（wikilink 到 decision）、新提及的人/线索
+  - 「演化时间线」段只写一行"会议召开" + raw 链接
+  - **例外 1**（sink Step 3c 反向闭环触发）：当本次 sink 把某个 decision 改 status: superseded、且本 meeting 是该 decision 的 source 之一时，允许做以下精确变更——
+    1. 在 page 末尾追加（或新增）`## 待确认事实` 段，写一行"follow_ups 因方案取代可能失效"提醒
+    2. 在 `## 演化时间线` 末尾追加一行"因 [[旧 decision]] 被取代 → [[新 decision]]"
+    3. 修改 frontmatter 的 `review_status` 字段（clean → needs_review）
+    禁止改写：原 frontmatter 其他字段、原 `follow_ups` 数组、原 `## 会议要点` 段、原已有时间线行
+  - **例外 2**（review/SKILL.md 闭环触发）：当用户通过 `review/SKILL.md` 处理本 meeting 上的 inbox 项时，允许做以下精确变更——
+    1. 修改 `## 待确认事实` 段（删除被否决/接受/moot 的行，或在该段全部处理完后整段删除）
+    2. 在 frontmatter 移动 `follow_ups` 数组项到 `obsolete_follow_ups`（含 `text/obsolete_reason/obsolete_date`）
+    3. 修改 `review_status`（needs_review → clean，仅在 `## 待确认事实` 段已空时）
+    4. 在 `## 演化时间线` 末尾追加一行"review 处理"摘要
+    5. 接受为事实的 inbox 项可在 `## 会议要点` 段尾部追加确认文本（**不可改写已有的会议要点行**——历史会议事实不可篡改）
+    禁止改写：原 frontmatter 其他字段、原 `## 会议要点` 已有行的文字、原 `attendees`、`meeting_date`、`mentions_people`、原已有时间线行
+
+  REVIEW 触发：
+  - 会议中产生的承诺、待办、对外信息
+  - 新出现的人名（mentions_people 里的人是否需要建独立档案？）
+  - 会议中提到的金额数字
+  - 金额、对外承诺、冲突类 REVIEW 必须让 review_status=needs_review，并写入「待确认事实」段，不能直接作为确定结论

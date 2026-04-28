@@ -1,0 +1,39 @@
+name: decision
+schema_version: 1
+
+description: |
+  一个具体的业务决策。例如"嘉宝棋牌室硬件接入方案"。
+
+  必须的 frontmatter（type 特化字段）：status（active/superseded/deferred）、aliases（数组，至少 1 个）
+  通用 frontmatter（title、type、schema_version、sources、review_status）见 docs/page-type-spec.md，所有 page 都必须有，不在此重复列。
+  可选：tags、decision_date、mentions_people（数组，决策中提及但非主导者的人）、supersedes、superseded_by
+
+  何时归到这里：raw 中出现"决定/拍板/选了/定方案/敲定"等动词，
+  且涉及一个可命名的方案/路线/选型。
+
+  title 启发式（命名纪律，要稳定可匹配）：
+  - 形如「{对象}{动作}方案」或「{对象}{选型}」
+    例：嘉宝棋牌室硬件接入方案 / 包间状态板硬件选型 / 商家结算月结切换方案
+  - 不要用人名当 title 主语（人名进 aliases 而非 title），避免人事变更后失效
+  - 不要用日期当 title（日期进 decision_date），title 是稳定身份
+  - aliases 也不要过度绑定临时参与人；如果人退出后别名会失效，放到 tags 或 mentions_people 更合适
+
+  拆分原则（避免一个 page 装太多）：
+  - 一个 page = 一个可独立命名的方案 / 一项可独立否决的选型
+  - 同一个会议出现多个独立选型时，必须拆成多个 decision page
+  - 范围 / 商业模式 / 技术架构是同一方案的不同切面，归到同一 page 的不同 H2 段，不拆
+
+  更新规则：
+  - 如果新 raw 提到的方案名 = 已有 decision 的 title 或某个 alias，更新它而非新建
+  - 内部演化：同一方案范围、约束或细节变化时，更新同一 page；把新事实合并到「当前结论」段，并在「演化时间线」末尾加一行
+  - 外部取代：如果新 raw 表示旧方案作废、路线根本转向、或被另一个可独立命名的新方案替代，新建 replacement decision；旧 page 的 status 改为 superseded，旧 page 加 superseded_by，新 page 加 supersedes
+  - 被 superseded 的旧 page 保留旧「当前结论」作为历史快照，但正文顶部必须加醒目的 superseded block，说明被谁、何时、为何取代，避免读取时误当当前约束
+  - replacement decision 的 sources 默认只放本次 raw；不要把旧方案 sources 复制过来，历史继承靠 supersedes 图边表达
+  - 新 raw 引入了新别名时，追加到 aliases 数组（不要替换）
+
+  REVIEW 触发：
+  - 涉及金额、对外承诺、与现有结论矛盾
+  - 涉及人名但 ID 不确定（重名风险）
+  - title 与已有 decision 的字面相似度高但语义可能不同（疑似重复，等人确认）
+  - status 改为 superseded 时，列出旧方案里的外部承诺、金额和待办，让用户判断是否需要主动通知相关方或更新计划
+  - 金额、对外承诺、冲突类 REVIEW 必须让 review_status=needs_review，并写入「待确认事实」段，不能直接作为确定结论
