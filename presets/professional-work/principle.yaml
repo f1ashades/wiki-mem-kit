@@ -1,0 +1,43 @@
+name: principle
+schema_version: 1
+# folder 默认 principles/（按 page-type-spec 解析约定 name + s）
+
+description: |
+  一条跨场景生效的产品哲学 / 边界原则 / 核心信念。例如"AI 不做考核管理，只做归因和建议"、"用户调研与 demo 必须严格分开"。
+
+  与 decision 的边界（核心区分）：
+  - decision 是**一次具体的方向选择**——具体方案、具体范围、有 status（可被 superseded）、有 decision_date
+  - principle 是**对未来多个场景生效的判断**——跨方向、极少更新、永不 superseded（只 amend）、无 decision_date
+
+  必须的 frontmatter（type 特化字段）：aliases（数组，至少 1 个，写人会怎么口语化引用这条）、scope（一句话说明它对哪些场景生效）
+  通用 frontmatter（title、type、schema_version、sources、review_status）见 docs/page-type-spec.md，所有 page 都必须有，不在此重复列。
+  可选：tags、related_principles（相关 principle 的 wikilink 列表）、mentioned_in_decisions（哪些 decision 引用了它）
+
+  何时归到这里：raw 中出现一句**对未来多个场景都生效的主张**，特别是包含以下模式：
+  - "我们不做 X"（边界原则，例：不做学员考核）
+  - "应该 X 不应该 Y"（价值判断，例：应该归因不该评分）
+  - "X 优先于 Y"（决策准则，例：先听用户痛点再做 demo）
+  - "用户其实需要 Z 而不是 W"（认知矫正，例：学员要进步感知不要过程数据）
+
+  反例：以下不是 principle，应该归到 decision：
+  - "正式课优先 vs 体验课"——是一次方向选择，不是跨场景原则
+  - "demo 排期 6 周"——是 tactical，进 follow_up
+  - "暂时不做 SaaS 订阅"——是 strategy，进 decision
+
+  拆分原则：
+  - 一句完整主张 = 一个 principle page，不要把两个独立主张塞一起
+  - 论据多了再 amend 同一 principle，不拆新 page
+  - 范围相近的 principle 用 related_principles wikilink 互相引用，不合并
+
+  更新规则：
+  - 按 title + aliases 模糊匹配已有 principle，匹配则**追加**到 ## 论据 / ## 场景应用 段，不覆盖
+  - **永不 superseded**——principle 不存在外部取代。如果用户明确说"以前那条原则我们改了"，按 amend 处理：在 ## 演化时间线 加一行说明变化点，正文「核心主张」更新
+  - 如果用户说"以前的原则被推翻了"，正文顶部加 ⚠️ block 写明被哪条新 principle 取代（或归为历史），但 page 不删
+  - 文件名：从 title 派生，kebab-zh，例：`ai-不做考核管理只归因建议.md`、`调研和-demo-严格分开.md`
+  - 不使用 status 字段（principle 没有 active/superseded 概念）
+  - 不使用 decision_date 字段（principle 没有"采纳日期"，是逐步形成的共识）
+
+  REVIEW 触发：
+  - 与已有 principle 矛盾（语义冲突）→ 高风险，标 needs_review，让用户决定是合并、保留两条还是修订
+  - principle 的边界不清（"X 不做"但没说什么算 X）→ 标 needs_review，待用户细化范围
+  - principle 来源是单次会议的随口一说（不像沉淀过的判断）→ 写入但标 needs_review，等下次复发再确认

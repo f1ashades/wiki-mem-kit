@@ -1,0 +1,30 @@
+name: competitor-profile
+schema_version: 1
+folder: competitors  # 显式覆盖默认 competitor-profiles/，目录名更短
+
+description: |
+  一个竞品 / 友商 / 同领域玩家的能力、定价、业务逻辑的结构化记录。例如"健身助手 SaaS"、"IVEP 学员管理工具"。
+
+  必须的 frontmatter（type 特化字段）：competitor_name、last_updated（YYYY-MM-DD）、status（active_tracking / dormant / dead）
+  通用 frontmatter（title、type、schema_version、sources、review_status）见 docs/page-type-spec.md，所有 page 都必须有，不在此重复列。
+  可选：tags、domain（业务领域）、aliases、known_failures（已知失败案例）、pricing（结构化定价对象）、business_model（一句话描述）、mentions_people（与该竞品有关的人，如 BD 联系人/前员工）
+
+  何时归到这里：raw 中出现对某竞品有**实质性**描述时——能力/定价/业务模式/失败案例/团队动向。一句话提到名字（"还有 X 也在做"）不触发；至少要有一个具体维度的信息才建 page。
+
+  拆分原则：
+  - 一个竞品 = 一个 page，永远不拆。竞品的不同维度（定价/能力/客户）放在同 page 的不同 H2 段
+  - 同一公司的多条产品线（如 A 公司 to B 和 to C 两条线）拆成两个 page，title 用 "{公司}-{产品线}" 区分
+  - 一个 page 永远不并多个竞品（哪怕"两家定位相似"）；交叉对比由 wikilink 或后续生成的 status page 处理
+
+  更新规则：
+  - 按 competitor_name + aliases 模糊匹配已有 page，匹配则更新该 page，不新建
+  - 新信息**追加**到「当前状态」段（不覆盖历史），并在「演化时间线」末尾加一行写明"何时新增了什么"
+  - 关键变化（定价大改、业务停摆、被收购）触发 status 字段变化（active_tracking → dormant / dead）；正文顶部加一段说明
+  - 不使用 supersedes/superseded_by——竞品 page 永远在原位演化，不被"取代"
+  - last_updated 字段每次更新都同步刷新
+
+  REVIEW 触发：
+  - 涉及竞品对外承诺（如 BD 给我们的合作意向、独家条款）→ 高风险，标 needs_review
+  - 我方与该竞品有正面冲突（同一客户被同时洽谈、定价被对方压制）→ 标 needs_review
+  - 竞品给的关键数字（用户量/营收/估值）来源不可靠（道听途说、推测） → 标 needs_review，写入「待确认事实」
+  - 仅来源于第三方转述、未直接验证的能力描述 → REVIEW 但通常不需 needs_review

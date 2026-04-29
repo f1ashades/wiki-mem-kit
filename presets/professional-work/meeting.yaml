@@ -20,6 +20,11 @@ description: |
   - decision 拆开放到 decisions/，meeting page 在「会议要点」里 wikilink 引用
   - 例：王五会议 → 1 个 meeting page + N 个 decision page，meeting 段落用 [[嘉宝棋牌室硬件接入方案]] 引用
 
+  可选段（按需加，不强制）：
+  - `## 行业洞察`：会议中获得的**对行业/用户/市场的认知**，与 ## 会议要点 区分。会议要点是"我们聊了什么、决了什么"（过程），行业洞察是"我们 get 到了什么"（认知产物）。
+    例：「教练管理上，强品牌走标准化、弱品牌走个性化激发」、「学员不在意过程数据、只在意进步感知」
+    这类 insight 当下不直接驱动 decision，但是后续所有相关 decision 的认知基础。如果 insight 反复出现且独立演化，未来可考虑升级到独立 page_type；现阶段在 meeting page 内承载即可
+
   更新规则：
   - 每次会议新建独立 page，不更新已有
   - 文件名格式：{meeting_date}-{对方主名 或 主题}.md，例 2026-04-25-王五.md
